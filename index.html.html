@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Abdulghani Fkhir — DevSecOps 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g0:#020802;--g2:#166534;--g4:#00ff41;--g5:#86efac;--mono:'Courier New',monospace;--sans:system-ui,sans-serif}
+html,body{width:100%;height:100%;background:#0a0f1e;font-family:var(--mono);overflow:hidden}
+.shell{width:100vw;height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(2,8,2,0.97);border-bottom:1px solid #0a1f0a;flex-shrink:0}
+.topbar-l{display:flex;gap:7px;align-items:center}
+.wd{width:10px;height:10px;border-radius:50%}
+.topbar-t{font-size:11px;color:var(--g4);letter-spacing:.07em}
+.topbar-c{font-size:11px;color:var(--g2)}
+.topbar-btn{background:rgba(0,255,65,.07);border:1px solid #0a1f0a;color:var(--g4);font-size:11px;padding:4px 12px;border-radius:3px;cursor:pointer;font-family:var(--mono)}
+.topbar-btn:hover{background:rgba(0,255,65,.15)}
+.prog{height:2px;background:#0a1f0a;flex-shrink:0}
+.prog-bar{height:100%;background:var(--g4);transition:width .35s;box-shadow:0 0 8px var(--g4)}
+#stage{flex:1;position:relative;overflow:hidden}
+#bgc{position:absolute;inset:0;z-index:0}
+.ov{position:absolute;inset:0;background:rgba(0,0,0,0.52);z-index:1;pointer-events:none}
+.scanlines{position:absolute;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,10,0,0.04) 3px,rgba(0,10,0,0.04) 4px)}
+.slide{display:none;position:absolute;inset:0;z-index:3;padding:40px 52px;flex-direction:column;justify-content:center;animation:fi .38s ease forwards;overflow:hidden}
+.slide.active{display:flex}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ssplit{flex-direction:row!important;padding:0!important}
+.sp-l{width:33%;background:rgba(0,8,0,.9);border-right:1px solid #0a1f0a;padding:32px 22px;display:flex;flex-direction:column;justify-content:center;flex-shrink:0;height:100%}
+.sp-l h2{font-size:18px;color:var(--g4);line-height:1.3;margin-bottom:8px;text-shadow:0 0 12px rgba(0,255,65,.4)}
+.sp-r{flex:1;padding:30px 28px;display:flex;flex-direction:column;justify-content:center}
+.av{width:46px;height:46px;border-radius:50%;background:rgba(0,255,65,.07);border:2px solid var(--g4);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--g4);margin:0 auto 10px;box-shadow:0 0 12px rgba(0,255,65,.2)}
+.pr{font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;color:var(--g2);display:flex;align-items:center;gap:5px}
+.pr::before{content:'▶';color:var(--g4);font-size:8px}
+.dtitle{font-size:clamp(22px,3.5vw,44px);line-height:1.14;margin-bottom:12px;color:var(--g4);text-shadow:0 0 20px rgba(0,255,65,.55),0 0 40px rgba(0,255,65,.2)}
+.stitle{font-size:clamp(15px,2.2vw,24px);line-height:1.2;margin-bottom:10px;color:var(--g4);text-shadow:0 0 14px rgba(0,255,65,.4)}
+.lead{font-size:12px;line-height:1.75;max-width:640px;margin-bottom:14px;color:var(--g5);font-family:var(--sans)}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.tag{font-size:9px;font-weight:700;padding:3px 9px;border-radius:2px;letter-spacing:.05em}
+.tg{background:rgba(0,255,65,.08);color:var(--g4);border:1px solid #0a1f0a}
+.tt{background:rgba(45,212,191,.08);color:#5eead4;border:1px solid #0d9488}
+.tb{background:rgba(96,165,250,.08);color:#93c5fd;border:1px solid #1d4ed8}
+.tr{background:rgba(248,113,113,.08);color:#fca5a5;border:1px solid #b91c1c}
+.ta{background:rgba(251,191,36,.08);color:#fcd34d;border:1px solid #b45309}
+.tp{background:rgba(196,181,253,.08);color:#c4b5fd;border:1px solid #7c3aed}
+.term{background:rgba(0,8,0,.85);border:1px solid #0a1f0a;border-radius:4px;padding:10px 13px;margin-top:10px;font-size:10px;line-height:1.9}
+.tc{color:var(--g2)}.tok{color:var(--g4)}.twarn{color:#fbbf24}.terr{color:#f87171}.tok2{color:#5eead4}
+.sbox{background:rgba(0,18,0,.72);border:1px solid #0a1f0a;border-radius:4px;padding:11px 16px;text-align:center}
+.sbox .n{font-size:20px;font-weight:700;color:var(--g4);text-shadow:0 0 8px rgba(0,255,65,.5);display:block}
+.sbox .l{font-size:9px;color:var(--g2);margin-top:3px;font-family:var(--sans);display:block}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:10px}
+.g4g{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.card{background:rgba(0,12,0,.78);border:1px solid #0a1f0a;border-radius:4px;padding:10px 12px}
+.card .ct{font-size:10px;font-weight:700;color:var(--g4);margin-bottom:4px}
+.card .cb{font-size:10px;color:var(--g5);line-height:1.55;font-family:var(--sans)}
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:10px 0}
+.fs{background:rgba(0,255,65,.07);border:1px solid var(--g2);color:var(--g4);font-size:9px;font-weight:700;padding:4px 9px;border-radius:2px}
+.fa{color:var(--g2);font-size:12px}
+.pts{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.pt{display:flex;gap:9px;font-size:11px;line-height:1.6;font-family:var(--sans)}
+.pd{color:var(--g4);font-family:var(--mono);flex-shrink:0;font-weight:700;font-size:10px}
+.ptt{color:var(--g5)}
+strong.h{font-weight:700;color:#d1fae5}
+.irow{border-bottom:1px solid #0a1f0a;padding:8px 0}
+.irow:last-child{border-bottom:none}
+.itop{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.iname{font-size:10px;font-weight:700;color:var(--g4)}
+.ibody{font-size:10px;color:var(--g5);line-height:1.5;font-family:var(--sans)}
+.note{background:rgba(0,18,0,.55);border-left:2px solid var(--g4);border-radius:0 3px 3px 0;padding:7px 11px;margin-top:8px;font-size:10px;color:var(--g5);line-height:1.6;font-family:var(--sans)}
+.bq{font-size:clamp(12px,1.6vw,18px);line-height:1.55;border-left:2px solid var(--g4);padding-left:16px;margin:14px auto;max-width:480px;color:var(--g5);font-family:var(--sans);font-style:italic}
+.ir{margin-bottom:7px}
+.ir .irl{font-size:9px;color:var(--g2);letter-spacing:.07em;text-transform:uppercase}
+.ir .irv{font-size:11px;color:var(--g5);margin-top:1px;font-family:var(--sans)}
+code{font-family:var(--mono);font-size:9.5px;background:rgba(0,255,65,.07);padding:1px 5px;border-radius:2px;color:var(--g4);border:1px solid #0a1f0a}
+.commit{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #0a1f0a;font-size:10px}
+.commit:last-child{border-bottom:none}
+.chash{color:#5eead4;font-family:var(--mono);flex-shrink:0;font-size:9px;margin-top:1px;min-width:52px}
+.cmsg{color:var(--g5);font-family:var(--sans);line-height:1.4}
+.cmsg.hi{color:var(--g4)}
+.pm-row{display:flex;gap:0;border-bottom:1px solid #0a1f0a;font-size:10px;font-family:var(--sans)}
+.pm-row:last-child{border-bottom:none}
+.pm-label{color:var(--g4);font-family:var(--mono);font-size:9px;min-width:95px;padding:4px 6px 4px 0;flex-shrink:0;font-weight:700}
+.pm-val{color:var(--g5);padding:4px 0;line-height:1.5}
+.pm-hi{color:#fbbf24}
+.nav{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 20px;background:rgba(2,8,2,.97);border-top:1px solid #0a1f0a;flex-shrink:0}
+.nbtn{background:rgba(0,255,65,.06);border:1px solid #0a1f0a;color:var(--g4);width:34px;height:34px;border-radius:3px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--mono)}
+.nbtn:hover{background:rgba(0,255,65,.15);border-color:var(--g4)}
+.nbtn:disabled{opacity:.25;cursor:default}
+.ndots{display:flex;gap:5px;flex-wrap:wrap;max-width:320px;justify-content:center}
+.ndot{width:6px;height:6px;border-radius:50%;background:#0a1f0a;border:1px solid var(--g2);cursor:pointer;transition:all .2s}
+.ndot.active{background:var(--g4);box-shadow:0 0 6px var(--g4)}
+@media(max-width:700px){.g2,.g3,.g4g{grid-template-columns:1fr}.ssplit{flex-direction:column!important}.sp-l{width:100%;height:auto;border-right:none;border-bottom:1px solid #0a1f0a}.slide{padding:24px 16px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="topbar">
+  <div class="topbar-l"><div class="wd" style="background:#ff5f56"></div><div class="wd" style="background:#ffbd2e"></div><div class="wd" style="background:#27c93f"></div></div>
+  <span class="topbar-t">abdulghani_fkhir :: devsecops_2026</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="topbar-c" id="cnt">01/16</span>
+    <button class="topbar-btn" onclick="toggleFull()">Helskärm [F]</button>
+  </div>
+</div>
+<div class="prog"><div class="prog-bar" id="pb"></div></div>
+
+<div id="stage">
+<canvas id="bgc"></canvas>
+<div class="ov"></div>
+<div class="scanlines"></div>
+
+<!-- 1. Cover -->
+<div class="slide active" style="align-items:center;text-align:center">
+  <div class="pr" style="justify-content:center">individuell reflektionsrapport · 2026</div>
+  <div class="dtitle" style="text-align:center">DevSecOps med<br>Docker & Kubernetes</div>
+  <p class="lead" style="text-align:center;margin:0 auto 16px">Under 11 veckor har jag byggt produktionsklara, säkerhetsvaliderade system — från CI/CD-pipelines och Terraform-infrastruktur till container-härdning, Gatekeeper-policies och Red Team-attacker i kontrollerad miljö.</p>
+  <div class="tags" style="justify-content:center">
+    <span class="tag tg">GitHub Actions</span><span class="tag tt">Trivy · SARIF · SBOM</span><span class="tag tg">Kubernetes · GKE</span><span class="tag ta">Terraform · GCP</span><span class="tag tr">Red Team</span><span class="tag tt">ArgoCD · GitOps</span><span class="tag tb">Helm · RBAC</span><span class="tag tp">Gatekeeper · OPA</span>
+  </div>
+  <div class="term" style="max-width:560px;margin:0 auto;text-align:left">
+    <span class="tc">$ </span><span class="tok">ls repos/ && student --status abdulghani</span><br>
+    <span class="tok">abbe-max/first-pipeline</span><span class="tc">          # v4 · CI/CD + k8s + helm + terraform + RBAC</span><br>
+    <span class="tok">abbe-max/lab1-terraform</span><span class="tc">          # v9 · GCP VM + ufw + fail2ban + snapshot</span><br>
+    <span class="tok">abbe-max/lab2-container-security</span><span class="tc"> # v10 · trivy + gatekeeper + CycloneDX SBOM</span><br>
+    <span class="tc">naervaro </span><span class="tok">97%</span><span class="tc"> · veckor </span><span class="tok">11</span><span class="tc"> [jan–apr 2026] · incidenter </span><span class="twarn">4 losta</span>
+  </div>
+  <div class="stats" style="justify-content:center;margin-top:16px">
+    <div class="sbox"><span class="n">97%</span><span class="l">Närvaro</span></div>
+    <div class="sbox"><span class="n">11</span><span class="l">Veckor</span></div>
+    <div class="sbox"><span class="n">3</span><span class="l">Repos</span></div>
+    <div class="sbox"><span class="n">4</span><span class="l">Incidenter lösta</span></div>
+  </div>
+</div>
+
+<!-- 2. Om mig -->
+<div class="slide ssplit">
+  <div class="sp-l">
+    <div class="av">AF</div>
+    <h2>Abdulghani<br>Fkhir</h2>
+    <p style="margin-top:8px;color:#166534;font-size:11px;font-family:system-ui;line-height:1.7">DevSecOps-student med starkt intresse för IT-säkerhet, automation och molninfrastruktur.</p>
+    <div style="margin-top:14px">
+      <div class="ir"><span class="irl">Kurs</span><span class="irv">DevSecOps med Docker och Kubernetes</span></div>
+      <div class="ir"><span class="irl">Period</span><span class="irv">Januari – April 2026</span></div>
+      <div class="ir"><span class="irl">Närvaro</span><span class="irv">97% av 11 kursveckor</span></div>
+      <div class="ir"><span class="irl">Repos</span><span class="irv">3 inlämnade · alla på GitHub</span></div>
+    </div>
+  </div>
+  <div class="sp-r">
+    <div class="pr">tre veckor i djupfokus</div>
+    <div class="stitle">Min tekniska resa</div>
+    <div class="pts">
+      <div class="pt"><div class="pd">[v4]</div><div class="ptt"><strong class="h">First Pipeline</strong> — CI/CD hackathon 4h. Gold-nivå med K8s, Helm, Terraform, RBAC. SARIF-incident löst i 3 commits.</div></div>
+      <div class="pt"><div class="pd">[v9]</div><div class="ptt"><strong class="h">Lab 1 · Terraform + GCP</strong> — Linux-VM med ufw, fail2ban, unattended-upgrades och daglig snapshot-policy i Terraform.</div></div>
+      <div class="pt"><div class="pd">[v10]</div><div class="ptt"><strong class="h">Lab 2 + Red vs Blue</strong> — Container-härdning, Gatekeeper, CycloneDX SBOM. Red Team hittade lösenord, buggar och misconfigurationer.</div></div>
+    </div>
+    <div class="note"><strong>Resterande veckor (v.1–3, v.5–8, v.11):</strong> Linux, Docker Compose & MongoDB, Kubernetes, GKE, Terraform remote state, OPA och reflektion — grunden allt vilar på.</div>
+  </div>
+</div>
+
+<!-- 3. Vecka 4 Pipeline -->
+<div class="slide">
+  <div class="pr">vecka 4 · abbe-max/first-pipeline · boiler room hackathon · 9 februari 2026</div>
+  <div class="stitle">Operation: First Pipeline — Gold Level</div>
+  <p class="lead">Scenariot: DevOps-ingenjören slutade igår, investerarna kräver pipeline till 12:00. Jag hade 4 timmar och nådde Gold med fler säkerhetsfunktioner än kursen krävde.</p>
+  <div class="flow">
+    <div class="fs">git push</div><div class="fa">→</div><div class="fs">npm test</div><div class="fa">→</div><div class="fs">validate scripts</div><div class="fa">→</div><div class="fs">docker build → GHCR</div><div class="fa">→</div><div class="fs">trivy scan</div><div class="fa">→</div><div class="fs">SARIF upload</div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Säkerhet direkt i workflow</div><div class="cb"><code>permissions: contents: read + security-events: write</code> — minsta privilegium. Concurrency <code>cancel-in-progress: true</code> sparar Actions-minuter.</div></div>
+    <div class="card"><div class="ct">Gold: K8s + Helm + HPA</div><div class="cb">3 replicas · non-root security context · liveness/readiness probes · HPA 2–10 replicas automatisk skalning · resource limits · Helm rollback</div></div>
+    <div class="card"><div class="ct">Säkerhetshärdad Dockerfile</div><div class="cb">Multi-stage: <code>node:20-alpine AS builder</code> → runtime. Non-root UID 1001. <code>npm ci --only=production</code>. Inbyggd HEALTHCHECK.</div></div>
+    <div class="card"><div class="ct">Terraform + RBAC tillagda</div><div class="cb">Commit <code>4c92517</code>: Terraform. Commit <code>9204606</code>: RBAC-roller. Inget av detta krävdes — jag applicerade vecka 7:s lärdomar direkt.</div></div>
+  </div>
+</div>
+
+<!-- 4. SARIF-incidenten -->
+<div class="slide">
+  <div class="pr">vecka 4 · sarif-incidenten · synlig i git log</div>
+  <div class="stitle">SARIF-incidenten — tre commits, en lärdom</div>
+  <p class="lead">Git-historiken är transparent och spårbar. Tre commits visar exakt hur jag felsökte problemet — det är DevSecOps i praktiken.</p>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Commits som bevis</div>
+      <div class="commit"><span class="chash">13ac492</span><span class="cmsg">Add app + pipeline</span></div>
+      <div class="commit"><span class="chash">21ccbca</span><span class="cmsg hi">Fix Trivy SARIF upload ← incident</span></div>
+      <div class="commit"><span class="chash">736c183</span><span class="cmsg hi">Fix Trivy SARIF upload ← försök 2</span></div>
+      <div class="commit"><span class="chash">f2dad09</span><span class="cmsg hi">Adjust SARIF severity ← LÖST</span></div>
+      <div class="commit"><span class="chash">9204606</span><span class="cmsg">Harden + add RBAC roles</span></div>
+      <div class="commit"><span class="chash">4c92517</span><span class="cmsg">Add Terraform configuration</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Rotorsak & lösning</div>
+      <div class="cb" style="font-family:var(--sans)">
+        <strong style="color:var(--g4)">Symptom:</strong> Upload kraschade — <code>trivy-results.sarif not found</code><br><br>
+        <strong style="color:var(--g4)">Rotorsak:</strong> Trivy hoppades över vid misslyckat build. Filen skapades aldrig men upload körde ändå.<br><br>
+        <strong style="color:var(--g4)">Lösning:</strong> <code>hashFiles('trivy-results.sarif') != ''</code> — säkrare än if:always() eftersom det förhindrar tomma uploads.<br><br>
+        <strong style="color:var(--g4)">Lärdom:</strong> Observabilitetsverktyg är viktigast när något gått fel — de måste alltid köra.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. Lab 1 Terraform -->
+<div class="slide">
+  <div class="pr">vecka 9 · abbe-max/lab1-terraform · gcp linux-vm</div>
+  <div class="stitle">Lab 1 — Terraform + GCP: Säkrad Linux-VM som kod</div>
+  <p class="lead">Jag definierade hela infrastrukturen i Terraform. Varje säkerhetsbeslut är reproducerbart, granskningsbart via Git och versionhanterat.</p>
+  <div class="g3">
+    <div class="card" style="border-top:1px solid var(--g4)"><div class="ct">Nätverkshärdning</div><div class="cb"><code>ufw</code>: blockerar all inkommande trafik utom det som explicit tillåts (t.ex. SSH). Defence by default-princip.</div></div>
+    <div class="card" style="border-top:1px solid #fcd34d"><div class="ct">Intrångsskydd</div><div class="cb"><code>fail2ban</code>: automatisk blockering av IP-adresser vid upprepade misslyckade inloggningar — brute force-skydd.</div></div>
+    <div class="card" style="border-top:1px solid #5eead4"><div class="ct">Auto-patching</div><div class="cb"><code>unattended-upgrades</code>: säkerhetspatchar installeras automatiskt — servern uppdateras utan manuell intervention.</div></div>
+  </div>
+  <div class="term" style="margin-top:10px">
+    <span class="tc"># Backup-strategi som kod (Terraform)</span><br>
+    <span class="tok">resource "google_compute_resource_policy" "snapshot" {</span><br>
+    <span class="tc">  snapshot_schedule_policy {</span><br>
+    <span class="tc">    schedule         { daily_schedule { ... } }</span><br>
+    <span class="tc">    retention_policy { max_retention_days = </span><span class="tok">7</span><span class="tc"> }   </span><span class="tc"># Dagliga snapshots · 7 dagars retention</span><br>
+    <span class="tc">  }</span><br>
+    <span class="tok">}</span><span class="tc">  # Pipeline: lint → security scan → validate</span>
+  </div>
+  <div class="note" style="margin-top:8px">Projektet använde feature branches med PRs (feature/gcp-plan, feature/readme) — professionellt Git-arbetsflöde med kodgranskning innan merge till main.</div>
+</div>
+
+<!-- 6. Lab 2 -->
+<div class="slide">
+  <div class="pr">vecka 10 · abbe-max/lab2-container-security</div>
+  <div class="stitle">Lab 2 — Sårbar vs Härdad Container</div>
+  <p class="lead">Jag byggde och jämförde två containers — en avsiktligt sårbar och en härdad — och dokumenterade varje skillnad med Trivy, SBOM och Gatekeeper-policies.</p>
+  <div class="g2">
+    <div class="card" style="border-left:2px solid #f87171;border-radius:0 4px 4px 0"><div class="ct" style="color:#fca5a5">Dockerfile.vulnerable → scan-before.txt</div><div class="cb">Äldre Python + gammal Flask · kör som root · inga health checks · scan-before.txt visar många CRITICAL-fynd</div></div>
+    <div class="card" style="border-left:2px solid var(--g4);border-radius:0 4px 4px 0"><div class="ct">Dockerfile.hardened → scan-after.txt</div><div class="cb">Modern slim-image · non-root user · requirements.txt · HEALTHCHECK · scan-after.txt visar drastiskt färre fynd</div></div>
+    <div class="card"><div class="ct">SBOM — CycloneDX-format</div><div class="cb">Jag genererade <code>sbom.json</code> med Trivy — komponentförteckning för supply chain-säkerhet. Visar exakt vad som finns i imagen.</div></div>
+    <div class="card"><div class="ct">Gatekeeper-policies</div><div class="cb"><span style="color:#fca5a5">Bad Pod: DENIED</span> — privileged, no limits, no probes, latest-tag, fel registry, default SA<br><span style="color:var(--g4)">Hardened Pod: ALLOWED</span> — 1 varning: default service account</div></div>
+  </div>
+</div>
+
+<!-- 7. Red vs Blue intro -->
+<div class="slide">
+  <div class="pr">vecka 10 · red vs blue · operation lockdown</div>
+  <div class="stitle">Läraren delade oss — jag var Red Team</div>
+  <p class="lead">Klassen delades i två grupper. Red Team fick attackera Blue Teams applikation (VaultCorp — crypto wallet). Vår uppgift: hitta lösenord, buggar, licensnycklar och misconfigurationer.</p>
+  <div class="term">
+    <span class="tc"># Operation Lockdown</span><br>
+    <span class="tc">min-roll     </span><span class="terr">RED TEAM — angripare</span><br>
+    <span class="tc">blue-roll    </span><span class="tok">forsvarare · GitOps via ArgoCD</span><br>
+    <span class="tc">studenter    </span><span class="tok">36</span><span class="tc"> · team: </span><span class="tok">8</span><span class="tc"> (4 Red + 4 Blue) · tid: </span><span class="tok">3.5 timmar</span><br>
+    <span class="tc">saarbarheter </span><span class="twarn">12 st · 110 poaeng per sida</span><br>
+    <span class="tc">blue-rule    </span><span class="tok">BARA deploy via Git</span><span class="tc"> — ArgoCD self-heal pa 30 sek</span>
+  </div>
+  <div class="g2" style="margin-top:10px">
+    <div class="card" style="border-top:1px solid #f87171"><div class="ct" style="color:#fca5a5">Jag som Red Team — mitt uppdrag</div><div class="cb">Read-only access till klustret och appen. Scanna, exploatera och dokumentera varje sårbarhet. Poäng för varje fynd med bevis.</div></div>
+    <div class="card" style="border-top:1px solid var(--g4)"><div class="ct">Blue Team — vad de försvarade</div><div class="cb">Alla fixar via Git. ArgoCD self-healar manuella kubectl-ändringar på 30 sek. Varje patch: commit → push → auto-deploy.</div></div>
+  </div>
+</div>
+
+<!-- 8. Vad Red Team hittade -->
+<div class="slide">
+  <div class="pr">vecka 10 · red team · fynd</div>
+  <div class="stitle">Lösenord, buggar och misconfigurationer vi hittade</div>
+  <p class="lead">Som angripare gick vi systematiskt igenom VaultCorps applikation och infrastruktur. Det vi hittade är exakt vad min pipeline från vecka 4 hade stoppat.</p>
+  <div class="g2">
+    <div class="card" style="border-left:2px solid #f87171;border-radius:0 4px 4px 0"><div class="ct" style="color:#fca5a5">Hårdkodade lösenord vi hittade</div><div class="cb"><code>SECRET_KEY=supersecret123</code><br><code>DB_PASSWORD=admin1234</code><br>Exponerade via <code>/debug</code>-endpoint i klartext — ingen autentisering krävs.</div></div>
+    <div class="card" style="border-left:2px solid #fbbf24;border-radius:0 4px 4px 0"><div class="ct" style="color:#fcd34d">Kodbugg: Command injection</div><div class="cb"><code>/lookup?wallet=;cat /etc/passwd</code><br>Körde godtyckliga kommandon på servern som root. XSS via template rendering utan sanitering.</div></div>
+    <div class="card" style="border-left:2px solid #c4b5fd;border-radius:0 4px 4px 0"><div class="ct" style="color:#c4b5fd">Kubernetes-misconfigurationer</div><div class="cb"><code>privileged: true</code> · <code>runAsUser: 0</code> · inga resource limits · default service account · NodePort exponerade externt</div></div>
+    <div class="card" style="border-left:2px solid #5eead4;border-radius:0 4px 4px 0"><div class="ct" style="color:#5eead4">Container-sårbarheter</div><div class="cb">Gammal base image med kända CVEs · unpinnad <code>:latest</code>-tag · inga liveness/readiness probes · saknade nätverkspolicyer</div></div>
+  </div>
+  <div class="note"><strong>Insikten:</strong> Allt vi hittade hade min pipeline stoppat — Trivy-gate, branch protection och GitHub Secrets förhindrar exakt dessa brister.</div>
+</div>
+
+<!-- 9. GitOps live -->
+<div class="slide">
+  <div class="pr">vecka 10 · argocd self-heal · gitops i verkligheten</div>
+  <div class="stitle">ArgoCD Self-Heal — 30 sekunder live inför klassen</div>
+  <p class="lead">När någon försökte göra manuella ändringar med <code>kubectl edit</code> direkt återställde ArgoCD allt inom 30 sekunder. Ingen föreläsning ger samma förståelse.</p>
+  <div class="pts">
+    <div class="pt"><div class="pd">[1]</div><div class="ptt"><strong class="h">GitOps som säkerhetsprincip.</strong> Blue kunde BARA deploya via Git. ArgoCD reverserade manuella ändringar på 30 sek — förhindrar sabotage och konfigurationsdrift simultant.</div></div>
+    <div class="pt"><div class="pd">[2]</div><div class="ptt"><strong class="h">Strukturerade incidentroller under press.</strong> IC, Comms Lead, Ops Lead tilldelade vid start. Team med tydlig rollstruktur patchade snabbare och kommunicerade bättre.</div></div>
+    <div class="pt"><div class="pd">[3]</div><div class="ptt"><strong class="h">Post-mortem direkt efter.</strong> Tidslinje, rotorsak, vad gick bra, action items — skrivet om incidenter vi just upplevt, inte hypotetiska scenarion.</div></div>
+    <div class="pt"><div class="pd">[4]</div><div class="ptt"><strong class="h">Att tänka som angripare gör mig till bättre försvarare.</strong> Jag ser nu sårbarheter i kod och konfiguration som jag tidigare inte lade märke till.</div></div>
+  </div>
+</div>
+
+<!-- 10. Fyra incidenter -->
+<div class="slide">
+  <div class="pr">fyra incidenter jag vill nämna</div>
+  <div class="stitle">Verkliga problem — verkliga lärdomar</div>
+  <div style="margin-top:8px">
+    <div class="irow"><div class="itop"><span class="tag tg">v.4</span><span class="iname">SARIF-filsfel — 3 commits för att lösa</span></div><div class="ibody"><strong>Symptom:</strong> Upload kraschade · <strong>Orsak:</strong> Trivy hoppades över, filen skapades aldrig · <strong>Fix:</strong> <code>hashFiles() != ''</code> · <strong>Lärdom:</strong> Observabilitet måste alltid köra</div></div>
+    <div class="irow"><div class="itop"><span class="tag tr">v.6</span><span class="iname">Credentials som inte fungerade — 401 Unauthorized mot GKE</span></div><div class="ibody"><strong>Symptom:</strong> GKE-åtkomst nekades · <strong>Orsak:</strong> Fel SA-credentials i GitHub Secrets · <strong>Fix:</strong> IAM-granskning + ny SA-nyckel · <strong>Lärdom:</strong> IAM kräver minsta privilegium</div></div>
+    <div class="irow"><div class="itop"><span class="tag ta">v.7</span><span class="iname">terraform apply blockerades — 403 Forbidden</span></div><div class="ibody"><strong>Symptom:</strong> Apply blockerades · <strong>Orsak:</strong> SA saknade GCS-skrivbehörighet för remote state · <strong>Fix:</strong> Storage Object Admin i IAM · <strong>Lärdom:</strong> IaC kräver samma säkerhetstänk som appkod</div></div>
+    <div class="irow"><div class="itop"><span class="tag tr">v.6</span><span class="iname">Kluster med för lite CPU — pods i Pending</span></div><div class="ibody"><strong>Symptom:</strong> Pods fastnade i Pending · <strong>Orsak:</strong> GKE saknade CPU-kvot · <strong>Fix:</strong> Uppgraderade nodpool + resource requests · <strong>Lärdom:</strong> Underdimensionering är ett angrepp på tillgänglighet</div></div>
+  </div>
+  <div class="note"><strong>Mönstret:</strong> Alla fyra incidenter hade sin rotorsak i konfigurationsfel, inte kodfel. IaC och tydlig IAM-struktur är försvaret.</div>
+</div>
+
+<!-- 11. SRE -->
+<div class="slide">
+  <div class="pr">sre-metodik · sli · slo · error budget</div>
+  <div class="stitle">SRE-principer — inte teori, utan praktik</div>
+  <p class="lead">Site Reliability Engineering handlar om att tillämpa mjukvarutekniska principer på driftsproblem. Jag tillämpade dessa konkret i varje repo.</p>
+  <div class="g3">
+    <div class="card" style="border-top:1px solid var(--g4)"><div class="ct">SLI — Service Level Indicator</div><div class="cb">Mätetal för systemets beteende. I min pipeline: andelen deployments utan CRITICAL-fynd. Trivy mäter detta automatiskt vid varje push.</div></div>
+    <div class="card" style="border-top:1px solid #5eead4"><div class="ct">SLO — Service Level Objective</div><div class="cb">Mitt implicita SLO: 0% av deployments ska innehålla CRITICAL-fynd. Branch protection och Trivy-gate upprätthåller SLO:t automatiskt.</div></div>
+    <div class="card" style="border-top:1px solid #fcd34d"><div class="ct">Error Budget</div><div class="cb">Skillnaden mellan 100% och SLO:t. Om budget konsumeras för snabbt pausas feature-development — säkerhet prioriteras. HPA skyddar tillgänglighets-budgeten.</div></div>
+  </div>
+  <div class="pts" style="margin-top:10px">
+    <div class="pt"><div class="pd">$</div><div class="ptt"><strong class="h">Självläkning:</strong> K8s liveness/readiness probes + HPA (2–10 replicas) + ArgoCD self-heal — systemet återhämtar sig automatiskt utan mänsklig intervention.</div></div>
+    <div class="pt"><div class="pd">$</div><div class="ptt"><strong class="h">Blameless culture:</strong> Post-mortem handlar om systemet — inte individen. VaultCorps CTO var inte problemet; avsaknaden av branch protection var.</div></div>
+  </div>
+</div>
+
+<!-- 12. Shared Responsibility -->
+<div class="slide">
+  <div class="pr">molnarkitektur · shared responsibility · arkitekturval</div>
+  <div class="stitle">Vem ansvarar för vad i GCP?</div>
+  <p class="lead">Shared responsibility model avgör säkerhetsgränsen. En vanlig missuppfattning är att molnet hanterar all säkerhet — men operativsystem, access och applikationer är alltid mitt ansvar.</p>
+  <div class="g2">
+    <div class="card" style="border-top:1px solid #93c5fd"><div class="ct" style="color:#93c5fd">GCP ansvarar för</div><div class="cb">Fysisk infrastruktur · nätverkshårdvara · hypervisor · grundläggande tjänster. GCP levererade compute-resursen — inget mer.</div></div>
+    <div class="card" style="border-top:1px solid var(--g4)"><div class="ct">Jag ansvarar för</div><div class="cb">VM-konfiguration (ufw, fail2ban) · access management (IAM, RBAC) · applikationssäkerhet · data · backup · kapacitetsplanering.</div></div>
+  </div>
+  <div class="pts" style="margin-top:10px">
+    <div class="pt"><div class="pd">[1]</div><div class="ptt"><strong class="h">Varför Terraform?</strong> Reproducerbarhet, granskning via Git, rollback och compliance-spårbarhet. Infrastruktur som kod eliminerar manuella misstag och skapar revisionsspår.</div></div>
+    <div class="pt"><div class="pd">[2]</div><div class="ptt"><strong class="h">Varför Kubernetes + Helm?</strong> Självläkning, automatisk skalning (HPA), declarativ konfiguration. Helm lägger till templating och rollback — prod-redo från dag ett.</div></div>
+    <div class="pt"><div class="pd">[3]</div><div class="ptt"><strong class="h">Defence in depth:</strong> Trivy i pipeline + Gatekeeper i kluster + ufw på VM. Om ett lager bryts finns nästa — säkerhet i flera lager.</div></div>
+  </div>
+</div>
+
+<!-- 13. Formellt post-mortem -->
+<div class="slide">
+  <div class="pr">post-mortem · pi-2026-001 · google sre-mall</div>
+  <div class="stitle">Formellt post-mortem — SARIF-incidenten</div>
+  <p class="lead">Att leda en incident skiljer sig från att lösa ett tekniskt problem. IC håller koll på helheten, Comms Lead dokumenterar, Ops Lead debuggar.</p>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Incidentfakta</div>
+      <div class="pm-row"><span class="pm-label">ID:</span><span class="pm-val">PI-2026-001</span></div>
+      <div class="pm-row"><span class="pm-label">Severity:</span><span class="pm-val pm-hi">SEV-2 — pipeline blockerad</span></div>
+      <div class="pm-row"><span class="pm-label">Varaktighet:</span><span class="pm-val">~2h · 3 commits</span></div>
+      <div class="pm-row"><span class="pm-label">Status:</span><span class="pm-val" style="color:var(--g4)">Löst</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Tidslinje</div>
+      <div class="pm-row"><span class="pm-label">T+0</span><span class="pm-val">Pipeline körs första gången med SARIF</span></div>
+      <div class="pm-row"><span class="pm-label">T+5 min</span><span class="pm-val pm-hi">Upload misslyckas: file not found</span></div>
+      <div class="pm-row"><span class="pm-label">T+15 min</span><span class="pm-val">Commit 21ccbca — fel hypotes</span></div>
+      <div class="pm-row"><span class="pm-label">T+30 min</span><span class="pm-val">Commit 736c183 — fortfarande fel</span></div>
+      <div class="pm-row"><span class="pm-label">T+60 min</span><span class="pm-val">Rotorsak identifierad</span></div>
+      <div class="pm-row"><span class="pm-label">T+75 min</span><span class="pm-val" style="color:var(--g4)">Commit f2dad09 — LÖST</span></div>
+    </div>
+  </div>
+  <div class="note" style="margin-top:8px"><strong>Rotorsak:</strong> Trivy kördes villkorsstyrt, hoppades över vid misslyckat build. Filen skapades aldrig. <strong>Lösning:</strong> <code>hashFiles()</code>-villkor. <strong>Action items:</strong> Implementerat ✓ · README uppdaterad ✓ · Explicit test planerad →</div>
+</div>
+
+<!-- 14. Säkerhet + Compliance -->
+<div class="slide">
+  <div class="pr">sakerhet · kostnad · compliance</div>
+  <div class="stitle">Tre aspekter som alltid hänger ihop</div>
+  <p class="lead">Säkerhet, kostnad och compliance är inte separata överväganden — varje arkitekturellt beslut påverkar alla tre simultant.</p>
+  <div class="g3">
+    <div class="card" style="border-top:2px solid var(--g4)"><div class="ct">Säkerhet i varje lager</div><div class="cb">Trivy shift-left · Non-root UID 1001 · RBAC i K8s · ufw + fail2ban på VM · Gatekeeper-policies · Secrets aldrig i kod · CycloneDX SBOM</div></div>
+    <div class="card" style="border-top:2px solid #fcd34d"><div class="ct">Kostnad är säkerhet</div><div class="cb">Concurrency cancel: färre Actions-minuter. Caching: 60% snabbare builds. CPU-brist i GKE: underdimensionering kostar mer vid driftstopp.</div></div>
+    <div class="card" style="border-top:2px solid #5eead4"><div class="ct">Compliance automatiserat</div><div class="cb">SARIF → GitHub Security: revisionsspårbar historik. SBOM CycloneDX: komponentförteckning per release. Branch protection: CI måste passera.</div></div>
+  </div>
+  <div class="term" style="margin-top:10px">
+    <span class="tc">$ </span><span class="tok">audit --all-repos</span><br>
+    <span class="tc">  trivy-gate     </span><span class="tok">[AKTIV]</span><span class="tc"> CRITICAL/HIGH stoppar deploy</span><br>
+    <span class="tc">  branch-protect </span><span class="tok">[AKTIV]</span><span class="tc"> CI maste passera fore merge</span><br>
+    <span class="tc">  SBOM           </span><span class="tok">[AKTIV]</span><span class="tc"> CycloneDX · lab2-container-security</span><br>
+    <span class="tc">  SARIF          </span><span class="tok">[AKTIV]</span><span class="tc"> GitHub Security tab · first-pipeline</span>
+  </div>
+</div>
+
+<!-- 15. Insikter -->
+<div class="slide">
+  <div class="pr">vad kursen laerte mig</div>
+  <div class="stitle">Sex insikter som förändrade mig</div>
+  <div class="pts" style="margin-top:12px">
+    <div class="pt"><div class="pd">[01]</div><div class="ptt"><strong class="h">Säkerhet är ett flöde — inte ett lager.</strong> Min Dockerfile, pipeline och k8s-manifest är alla härdade. Det är inte en funktion jag la till — det är hur jag tänker nu.</div></div>
+    <div class="pt"><div class="pd">[02]</div><div class="ptt"><strong class="h">Att tänka som angripare gör mig till bättre försvarare.</strong> Red Team-arbetet förändrade hur jag granskar kod — jag ser nu sårbarheter jag tidigare missade.</div></div>
+    <div class="pt"><div class="pd">[03]</div><div class="ptt"><strong class="h">Konfigurationsfel är den vanligaste rotorsaken.</strong> Alla fyra incidenter berodde på konfiguration — inte kod. IaC och tydlig IAM är försvaret.</div></div>
+    <div class="pt"><div class="pd">[04]</div><div class="ptt"><strong class="h">GitOps är mer än ett workflow — det är en säkerhetsprincip.</strong> ArgoCD self-heal förhindrar sabotage och konfigurationsdrift simultant.</div></div>
+    <div class="pt"><div class="pd">[05]</div><div class="ptt"><strong class="h">Shared responsibility kräver att jag tar ansvar.</strong> GCP hanterar molnet — jag hanterar allt i molnet. CPU-bristen visade att kapacitetsplanering är mitt ansvar.</div></div>
+    <div class="pt"><div class="pd">[06]</div><div class="ptt"><strong class="h">Gå utöver kraven — där sker det verkliga lärandet.</strong> K8s, Helm, Terraform och RBAC krävdes inte i vecka 4. Men det var det arbetet som gav mest.</div></div>
+  </div>
+</div>
+
+<!-- 16. Avslut -->
+<div class="slide" style="align-items:center;text-align:center">
+  <div class="av" style="margin-bottom:14px">AF</div>
+  <div class="dtitle" style="font-size:clamp(20px,3vw,36px)">Abdulghani Fkhir</div>
+  <p class="lead" style="text-align:center;margin:8px auto 16px">DevSecOps med Docker och Kubernetes · Januari – April 2026</p>
+  <div class="bq">"Från noll Terraform-erfarenhet i januari<br>till att attackera system som Red Team,<br>bygga Gold-nivå pipeline med K8s och Helm,<br>och förstå SRE inifrån och ut."</div>
+  <div class="term" style="max-width:440px;margin:14px auto 0;text-align:left">
+    <span class="tc">$ </span><span class="tok">final --student abdulghani</span><br>
+    <span class="tc">  repos      </span><span class="tok">first-pipeline · lab1-terraform · lab2-container-security</span><br>
+    <span class="tc">  naervaro   </span><span class="tok">97%</span><span class="tc"> [jan–apr 2026]</span><br>
+    <span class="tc">  incidenter </span><span class="tok">4 dokumenterade och losta</span><br>
+    <span class="tc">  red-team   </span><span class="tok">loesenord, buggar, misconfigurationer hittade</span><br>
+    <span class="tc">  naesta     </span><span class="tok">LIA inom IT-sakerhet / DevSecOps</span>
+  </div>
+</div>
+
+</div><!-- /stage -->
+
+<div class="nav">
+  <button class="nbtn" id="pb2" onclick="go(-1)" disabled>‹</button>
+  <div class="ndots" id="dts"></div>
+  <button class="nbtn" id="nb2" onclick="go(1)">›</button>
+</div>
+</div><!-- /shell -->
+
+<script>
+const ANIMS=['matrix','network','binary','radar','hex','matrix','binary','network','radar','hex','matrix','binary','radar','network','hex','pulse'];
+const canvas=document.getElementById('bgc'),ctx=canvas.getContext('2d'),stage=document.getElementById('stage');
+let aState={},t=0,cur=0,aType='matrix',lastT=0;
+const CH='アウエカキ0123456789ABCDEFabcdef><{}[]|/\\#$%01';
+
+function resize(){canvas.width=stage.offsetWidth||1200;canvas.height=stage.offsetHeight||700;}
+resize();window.addEventListener('resize',()=>{resize();aState=init(aType);});
+
+function init(type){
+  const w=canvas.width,h=canvas.height;
+  if(type==='matrix')return{drops:Array.from({length:Math.floor(w/18)},()=>Math.random()*h/18)};
+  if(type==='network')return{ps:Array.from({length:50},()=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.7,vy:(Math.random()-.5)*.7}))};
+  if(type==='binary')return{cols:Array.from({length:Math.floor(w/22)},(_,i)=>({x:i*22+11,y:Math.random()*h,sp:.8+Math.random()*1.3}))};
+  if(type==='radar')return{blips:[]};
+  return{};
+}
+
+function drawMatrix(){
+  const w=canvas.width,h=canvas.height;
+  ctx.fillStyle='rgba(0,8,0,0.07)';ctx.fillRect(0,0,w,h);ctx.font='13px Courier New';
+  aState.drops.forEach((y,i)=>{
+    ctx.shadowBlur=9;ctx.shadowColor='#00ff41';ctx.fillStyle='#fff';ctx.fillText(CH[Math.floor(Math.random()*CH.length)],i*18,y*18);ctx.shadowBlur=0;
+    for(let j=1;j<14;j++){const a=Math.max(0,(1-j/14)*.72);ctx.fillStyle=`rgba(0,${Math.floor(155+Math.random()*100)},0,${a})`;ctx.fillText(CH[Math.floor(Math.random()*CH.length)],i*18,(y-j)*18);}
+    if(y*18>h&&Math.random()>.975)aState.drops[i]=0;aState.drops[i]+=.5;
+  });
+}
+function drawNetwork(){
+  const w=canvas.width,h=canvas.height;
+  ctx.fillStyle='rgba(0,6,0,0.11)';ctx.fillRect(0,0,w,h);
+  const ps=aState.ps;
+  ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;});
+  for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+    const dx=ps[i].x-ps[j].x,dy=ps[i].y-ps[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<130){ctx.strokeStyle=`rgba(0,255,65,${(1-d/130)*.32})`;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(ps[i].x,ps[i].y);ctx.lineTo(ps[j].x,ps[j].y);ctx.stroke();}
+  }
+  ps.forEach(p=>{ctx.fillStyle='#00ff41';ctx.shadowBlur=7;ctx.shadowColor='#00ff41';ctx.beginPath();ctx.arc(p.x,p.y,2.2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;});
+}
+function drawBinary(){
+  const w=canvas.width,h=canvas.height;
+  ctx.fillStyle='rgba(0,8,0,0.09)';ctx.fillRect(0,0,w,h);ctx.font='11px Courier New';
+  aState.cols.forEach(c=>{
+    for(let i=0;i<17;i++){const a=(17-i)/17;ctx.fillStyle=i===0?`rgba(255,255,255,${a})`:`rgba(0,${Math.floor(180*a)},0,${a*.88})`;ctx.fillText(Math.round(Math.random()),c.x,c.y-i*14);}
+    c.y+=c.sp;if(c.y-17*14>h){c.y=-14;c.sp=.8+Math.random()*1.3;}
+  });
+}
+function drawRadar(){
+  const w=canvas.width,h=canvas.height;
+  ctx.fillStyle='rgba(0,6,0,0.15)';ctx.fillRect(0,0,w,h);
+  const cx=w/2,cy=h/2,r=Math.min(w,h)*.44,ang=(t*.018)%(Math.PI*2);
+  [1,.75,.5,.25].forEach(f=>{ctx.strokeStyle='rgba(0,185,0,0.18)';ctx.lineWidth=.5;ctx.beginPath();ctx.arc(cx,cy,r*f,0,Math.PI*2);ctx.stroke();});
+  ctx.strokeStyle='rgba(0,185,0,0.1)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(cx-r,cy);ctx.lineTo(cx+r,cy);ctx.moveTo(cx,cy-r);ctx.lineTo(cx,cy+r);ctx.stroke();
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(ang);
+  const sw=ctx.createLinearGradient(0,0,r,0);sw.addColorStop(0,'rgba(0,255,65,0.52)');sw.addColorStop(.6,'rgba(0,255,65,0.08)');sw.addColorStop(1,'rgba(0,255,65,0)');
+  ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,-.42,0);ctx.closePath();ctx.fillStyle=sw;ctx.fill();ctx.restore();
+  if(Math.random()>.97){const ba=Math.random()*Math.PI*2,br=Math.random()*r*.88;aState.blips.push({x:cx+Math.cos(ba)*br,y:cy+Math.sin(ba)*br,life:80});}
+  aState.blips=aState.blips.filter(b=>b.life>0);
+  aState.blips.forEach(b=>{const a=b.life/80;ctx.fillStyle=`rgba(0,255,65,${a})`;ctx.shadowBlur=10;ctx.shadowColor='#00ff41';ctx.beginPath();ctx.arc(b.x,b.y,3.5*a,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;b.life--;});
+}
+function drawHex(){
+  const w=canvas.width,h=canvas.height;
+  ctx.fillStyle='rgba(0,4,0,0.15)';ctx.fillRect(0,0,w,h);
+  const s=38,hh=s*Math.sqrt(3);
+  for(let row=-1;row<h/hh+2;row++)for(let col=-1;col<w/(s*1.5)+2;col++){
+    const x=col*s*1.5,y=row*hh+(col%2?hh/2:0),ph=(Math.sin(t*.014+col*.4+row*.3)+1)/2;
+    ctx.strokeStyle=`rgba(0,${Math.floor(58+ph*178)},0,${.065+ph*.26})`;ctx.lineWidth=.9;
+    ctx.beginPath();for(let k=0;k<6;k++){const a=Math.PI/3*k-Math.PI/6,px=x+s*.87*Math.cos(a),py=y+s*.87*Math.sin(a);k===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}
+    ctx.closePath();ctx.stroke();if(ph>.82){ctx.fillStyle=`rgba(0,255,65,${(ph-.82)*.2})`;ctx.fill();}
+  }
+}
+function drawPulse(){
+  const w=canvas.width,h=canvas.height;
+  ctx.fillStyle='rgba(0,4,0,0.18)';ctx.fillRect(0,0,w,h);
+  const cx=w/2,cy=h/2,mR=Math.max(w,h)*.58;
+  for(let i=0;i<5;i++){const ph=((t*.008+i*.2)%1),r=ph*mR,a=(1-ph)*.42;ctx.strokeStyle=`rgba(0,255,65,${a})`;ctx.lineWidth=1.5;ctx.shadowBlur=8;ctx.shadowColor='#00ff41';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;}
+  const pulse=(Math.sin(t*.05)+1)/2;
+  ctx.fillStyle=`rgba(0,255,65,${.025+pulse*.045})`;ctx.beginPath();ctx.arc(cx,cy,32,0,Math.PI*2);ctx.fill();
+}
+
+function draw(){
+  if(aType==='matrix')drawMatrix();else if(aType==='network')drawNetwork();
+  else if(aType==='binary')drawBinary();else if(aType==='radar')drawRadar();
+  else if(aType==='hex')drawHex();else drawPulse();
+}
+function loop(ts){if(ts-lastT>28){t++;draw();lastT=ts;}requestAnimationFrame(loop);}
+
+const slides=document.querySelectorAll('.slide'),total=slides.length;
+const dw=document.getElementById('dts'),pb2=document.getElementById('pb2'),nb2=document.getElementById('nb2'),cntEl=document.getElementById('cnt'),pbEl=document.getElementById('pb');
+slides.forEach((_,i)=>{const d=document.createElement('div');d.className='ndot'+(i===0?' active':'');d.onclick=()=>gt(i);dw.appendChild(d);});
+
+function gt(n){
+  slides[cur].classList.remove('active');dw.children[cur].classList.remove('active');
+  cur=Math.max(0,Math.min(total-1,n));
+  slides[cur].classList.add('active');dw.children[cur].classList.add('active');
+  cntEl.textContent=(cur+1<10?'0'+(cur+1):cur+1)+'/'+total;
+  pbEl.style.width=((cur+1)/total*100)+'%';
+  pb2.disabled=cur===0;nb2.disabled=cur===total-1;
+  const na=ANIMS[cur];if(na!==aType){aType=na;aState=init(aType);}
+}
+function go(d){gt(cur+d);}
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(1);}
+  if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(-1);}
+  if(e.key==='f'||e.key==='F')toggleFull();
+  if(e.key==='Home')gt(0);if(e.key==='End')gt(total-1);
+});
+function toggleFull(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen();}
+aState=init('matrix');requestAnimationFrame(loop);
+</script>
+</body>
+</html>
